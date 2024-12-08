@@ -1,8 +1,50 @@
 #![allow(unused)]
 
-use std::fmt::Display;
+use std::{
+    fmt::Display,
+    ops::{Add, Sub},
+};
 
-pub type Point = (i32, i32);
+#[derive(PartialEq, Eq, Clone, Copy)]
+pub struct Point(pub i32, pub i32);
+
+impl Point {
+    pub fn zero() -> Self {
+        Point(0, 0)
+    }
+}
+
+impl Add<Point> for Point {
+    type Output = Point;
+
+    fn add(self, rhs: Point) -> Self::Output {
+        Point(self.0 + rhs.0, self.1 + rhs.1)
+    }
+}
+
+impl Add<(i32, i32)> for Point {
+    type Output = Point;
+
+    fn add(self, rhs: (i32, i32)) -> Self::Output {
+        Point(self.0 + rhs.0, self.1 + rhs.1)
+    }
+}
+
+impl Sub<Point> for Point {
+    type Output = Point;
+
+    fn sub(self, rhs: Point) -> Self::Output {
+        Point(self.0 - rhs.0, self.1 - rhs.1)
+    }
+}
+
+impl Sub<(i32, i32)> for Point {
+    type Output = Point;
+
+    fn sub(self, rhs: (i32, i32)) -> Self::Output {
+        Point(self.0 - rhs.0, self.1 - rhs.1)
+    }
+}
 
 pub fn print_grid(grid: &Vec<Vec<impl Display>>) {
     for line in grid {
@@ -13,14 +55,6 @@ pub fn print_grid(grid: &Vec<Vec<impl Display>>) {
     }
 
     println!();
-}
-
-pub fn add(a: (i32, i32), b: (i32, i32)) -> (i32, i32) {
-    (a.0 + b.0, a.1 + b.1)
-}
-
-pub fn sub(a: (i32, i32), b: (i32, i32)) -> (i32, i32) {
-    (a.0 - b.0, a.1 - b.1)
 }
 
 pub fn dist_squared(a: Point, b: Point) -> i32 {
@@ -39,7 +73,7 @@ pub fn colinear(a: Point, b: Point, c: Point) -> bool {
     slope1 == slope2 && slope1 == slope3 && slope2 == slope3
 }
 
-pub fn get<T: Clone>(grid: &Vec<Vec<T>>, pos: (i32, i32)) -> Option<T> {
+pub fn get<T: Clone>(grid: &Vec<Vec<T>>, pos: Point) -> Option<T> {
     if pos.0 < 0 || pos.1 < 0 {
         return None;
     }
@@ -49,7 +83,7 @@ pub fn get<T: Clone>(grid: &Vec<Vec<T>>, pos: (i32, i32)) -> Option<T> {
         .flatten()
 }
 
-pub fn get_mut<T: Clone>(grid: &mut Vec<Vec<T>>, pos: (i32, i32)) -> Option<&mut T> {
+pub fn get_mut<T: Clone>(grid: &mut Vec<Vec<T>>, pos: Point) -> Option<&mut T> {
     if pos.0 < 0 || pos.1 < 0 {
         return None;
     }
@@ -59,7 +93,7 @@ pub fn get_mut<T: Clone>(grid: &mut Vec<Vec<T>>, pos: (i32, i32)) -> Option<&mut
         .flatten()
 }
 
-pub fn set<T: Clone>(grid: &mut Vec<Vec<T>>, pos: (i32, i32), val: T) {
+pub fn set<T: Clone>(grid: &mut Vec<Vec<T>>, pos: Point, val: T) {
     if pos.0 < 0 || pos.1 < 0 {
         return;
     }
@@ -68,24 +102,24 @@ pub fn set<T: Clone>(grid: &mut Vec<Vec<T>>, pos: (i32, i32), val: T) {
         .map(|x| x.get_mut(pos.0 as usize).map(|x| *x = val));
 }
 
-pub fn enumerate<T>(grid: &Vec<Vec<T>>) -> impl Iterator<Item = ((i32, i32), &T)> {
+pub fn enumerate<T>(grid: &Vec<Vec<T>>) -> impl Iterator<Item = (Point, &T)> {
     grid.iter()
         .enumerate()
         .map(|(y, row)| {
             row.iter()
                 .enumerate()
-                .map(move |(x, val)| ((x as i32, y as i32), val))
+                .map(move |(x, val)| (Point(x as i32, y as i32), val))
         })
         .flatten()
 }
 
-pub fn enumerate_mut<T>(grid: &mut Vec<Vec<T>>) -> impl Iterator<Item = ((i32, i32), &mut T)> {
+pub fn enumerate_mut<T>(grid: &mut Vec<Vec<T>>) -> impl Iterator<Item = (Point, &mut T)> {
     grid.iter_mut()
         .enumerate()
         .map(|(y, row)| {
             row.iter_mut()
                 .enumerate()
-                .map(move |(x, val)| ((x as i32, y as i32), val))
+                .map(move |(x, val)| (Point(x as i32, y as i32), val))
         })
         .flatten()
 }
