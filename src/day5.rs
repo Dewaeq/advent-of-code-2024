@@ -4,37 +4,14 @@ use aoc_runner_derive::aoc;
 
 fn parse_rules(s: &str) -> HashMap<i32, Vec<i32>> {
     let mut preceders = HashMap::<i32, Vec<i32>>::new();
-    let pairs: Vec<(i32, i32)> = s
-        .lines()
-        .map(|line| {
-            let (a, b) = line.split_once("|").unwrap();
-            let (a, b) = (a.parse().unwrap(), b.parse().unwrap());
-            preceders
-                .entry(a)
-                .and_modify(|v| v.push(b))
-                .or_insert(vec![b]);
-            (a, b)
-        })
-        .collect();
-    //for (key, _) in pairs {
-    //let bounds = preceders.get(&key).unwrap();
-    //let mut queue = bounds.clone();
-    //let mut output = vec![];
-
-    //while !queue.is_empty() {
-    //let x = queue.pop().unwrap();
-    //if output.contains(&x) {
-    //continue;
-    //}
-    //output.push(x);
-
-    //if let Some(v) = preceders.get(&x) {
-    //queue.extend(v);
-    //}
-    //}
-
-    //preceders.entry(key).and_modify(|v| *v = output);
-    //}
+    for line in s.lines() {
+        let (a, b) = line.split_once("|").unwrap();
+        let (a, b) = (a.parse().unwrap(), b.parse().unwrap());
+        preceders
+            .entry(a)
+            .and_modify(|v| v.push(b))
+            .or_insert(vec![b]);
+    }
 
     preceders
 }
