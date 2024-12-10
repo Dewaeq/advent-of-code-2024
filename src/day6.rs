@@ -1,6 +1,6 @@
 use aoc_runner_derive::aoc;
 
-use crate::utils::{get, get_mut, set, Point};
+use crate::utils::{get, get_mut, read_grid, set, Point};
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Cell {
@@ -42,24 +42,17 @@ fn dir_mask(dir: (i32, i32)) -> u8 {
 
 fn parse_input(input: &str) -> (Point, Vec<Vec<Cell>>) {
     let mut start_pos = Point::zero();
-    let grid = input
-        .lines()
-        .enumerate()
-        .map(|(y, line)| {
-            line.char_indices()
-                .map(|(x, c)| {
-                    if c == '^' {
-                        start_pos = Point(x as i32, y as i32);
-                    }
-                    match c {
-                        '#' => Cell::Obstacle,
-                        '^' => Cell::Visited(dir_mask((0, -1))),
-                        _ => Cell::Unvisited,
-                    }
-                })
-                .collect()
-        })
-        .collect();
+    let grid = read_grid(input, |pos, c| {
+        if c == '^' {
+            start_pos = pos;
+        }
+        match c {
+            '#' => Cell::Obstacle,
+            '^' => Cell::Visited(dir_mask((0, -1))),
+            _ => Cell::Unvisited,
+        }
+    });
+
     (start_pos, grid)
 }
 

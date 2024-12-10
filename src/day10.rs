@@ -27,7 +27,7 @@ fn search(pos: Point, grid: &mut Grid<i32>, is_part_one: bool) -> i32 {
 
 #[aoc(day10, part1)]
 fn part1(input: &str) -> i32 {
-    let grid = read_grid(input, |c| c.to_digit(10).unwrap() as i32);
+    let grid = read_grid(input, |_, c| c.to_digit(10).unwrap() as i32);
 
     let mut count = 0;
     for (pos, &val) in enumerate(&grid) {
@@ -41,7 +41,7 @@ fn part1(input: &str) -> i32 {
 
 #[aoc(day10, part2)]
 fn part2(input: &str) -> i32 {
-    let grid = read_grid(input, |c| c.to_digit(10).unwrap() as i32);
+    let grid = read_grid(input, |_, c| c.to_digit(10).unwrap() as i32);
 
     let mut count = 0;
     for (pos, &val) in enumerate(&grid) {

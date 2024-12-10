@@ -52,10 +52,16 @@ impl Sub<(i32, i32)> for Point {
     }
 }
 
-pub fn read_grid<T>(input: &str, parse: fn(char) -> T) -> Grid<T> {
+pub fn read_grid<T>(input: &str, mut parse: impl FnMut(Point, char) -> T) -> Grid<T> {
     input
         .lines()
-        .map(|line| line.chars().map(|c| parse(c)).collect())
+        .enumerate()
+        .map(|(y, line)| {
+            line.chars()
+                .enumerate()
+                .map(|(x, c)| parse(Point(x as _, y as _), c))
+                .collect()
+        })
         .collect()
 }
 
