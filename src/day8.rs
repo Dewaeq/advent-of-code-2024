@@ -1,9 +1,9 @@
-use crate::utils::{colinear, dist_squared, enumerate, slope, Point};
+use crate::utils::{enumerate, read_grid, Point};
 use aoc_runner_derive::aoc;
 use std::collections::HashMap;
 
 fn count(input: &str, is_part_two: bool) -> i32 {
-    let grid: Vec<Vec<char>> = input.lines().map(|line| line.chars().collect()).collect();
+    let grid = read_grid(input, |_, c| c);
     let antennas: HashMap<char, Vec<Point>> =
         enumerate(&grid).fold(HashMap::new(), |mut map, (pos, &val)| {
             if val != '.' {
@@ -25,15 +25,15 @@ fn count(input: &str, is_part_two: bool) -> i32 {
                     }
 
                     if is_part_two {
-                        if colinear(pos, antenna1, antenna2) || pos == antenna1 || pos == antenna2 {
+                        if pos.colinear(antenna1, antenna2) || pos == antenna1 || pos == antenna2 {
                             count += 1;
                             continue 'outer;
                         }
                     } else {
-                        let dist1 = dist_squared(pos, antenna1);
-                        let dist2 = dist_squared(pos, antenna2);
-                        let dir1 = slope(pos, antenna1);
-                        let dir2 = slope(pos, antenna2);
+                        let dist1 = pos.dist_squared(antenna1);
+                        let dist2 = pos.dist_squared(antenna2);
+                        let dir1 = pos.slope(antenna1);
+                        let dir2 = pos.slope(antenna2);
 
                         if dist1 == 0 || dist2 == 0 {
                             continue;

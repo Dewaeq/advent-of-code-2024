@@ -18,6 +18,22 @@ impl Point {
     pub const fn orth_dirs() -> [Point; 4] {
         [Point(0, -1), Point(1, 0), Point(0, 1), Point(-1, 0)]
     }
+
+    pub fn dist_squared(self, b: Point) -> i32 {
+        (self.0 - b.0).pow(2) + (self.1 - b.1).pow(2)
+    }
+
+    pub fn slope(self, b: Point) -> f32 {
+        (self.1 - b.1) as f32 / (self.0 - b.0) as f32
+    }
+
+    pub fn colinear(self, b: Point, c: Point) -> bool {
+        let slope1 = self.slope(b);
+        let slope2 = self.slope(c);
+        let slope3 = c.slope(b);
+
+        slope1 == slope2 && slope1 == slope3 && slope2 == slope3
+    }
 }
 
 impl Add<Point> for Point {
@@ -74,22 +90,6 @@ pub fn print_grid(grid: &Grid<impl Display>) {
     }
 
     println!();
-}
-
-pub fn dist_squared(a: Point, b: Point) -> i32 {
-    (a.0 - b.0).pow(2) + (a.1 - b.1).pow(2)
-}
-
-pub fn slope(a: Point, b: Point) -> f32 {
-    (a.1 - b.1) as f32 / (a.0 - b.0) as f32
-}
-
-pub fn colinear(a: Point, b: Point, c: Point) -> bool {
-    let slope1 = slope(a, b);
-    let slope2 = slope(a, c);
-    let slope3 = slope(c, b);
-
-    slope1 == slope2 && slope1 == slope3 && slope2 == slope3
 }
 
 pub fn get<T: Clone>(grid: &Grid<T>, pos: Point) -> Option<T> {
