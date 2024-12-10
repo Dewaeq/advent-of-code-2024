@@ -5,12 +5,18 @@ use std::{
     ops::{Add, Sub},
 };
 
-#[derive(PartialEq, Eq, Clone, Copy)]
+pub type Grid<T> = Vec<Vec<T>>;
+
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub struct Point(pub i32, pub i32);
 
 impl Point {
-    pub fn zero() -> Self {
+    pub const fn zero() -> Self {
         Point(0, 0)
+    }
+
+    pub const fn orth_dirs() -> [Point; 4] {
+        [Point(0, -1), Point(1, 0), Point(0, 1), Point(-1, 0)]
     }
 }
 
@@ -46,7 +52,14 @@ impl Sub<(i32, i32)> for Point {
     }
 }
 
-pub fn print_grid(grid: &Vec<Vec<impl Display>>) {
+pub fn read_grid<T>(input: &str, parse: fn(char) -> T) -> Grid<T> {
+    input
+        .lines()
+        .map(|line| line.chars().map(|c| parse(c)).collect())
+        .collect()
+}
+
+pub fn print_grid(grid: &Grid<impl Display>) {
     for line in grid {
         for val in line {
             print!("{val}");
@@ -73,7 +86,7 @@ pub fn colinear(a: Point, b: Point, c: Point) -> bool {
     slope1 == slope2 && slope1 == slope3 && slope2 == slope3
 }
 
-pub fn get<T: Clone>(grid: &Vec<Vec<T>>, pos: Point) -> Option<T> {
+pub fn get<T: Clone>(grid: &Grid<T>, pos: Point) -> Option<T> {
     if pos.0 < 0 || pos.1 < 0 {
         return None;
     }
@@ -83,7 +96,7 @@ pub fn get<T: Clone>(grid: &Vec<Vec<T>>, pos: Point) -> Option<T> {
         .flatten()
 }
 
-pub fn get_mut<T: Clone>(grid: &mut Vec<Vec<T>>, pos: Point) -> Option<&mut T> {
+pub fn get_mut<T: Clone>(grid: &mut Grid<T>, pos: Point) -> Option<&mut T> {
     if pos.0 < 0 || pos.1 < 0 {
         return None;
     }
@@ -93,7 +106,7 @@ pub fn get_mut<T: Clone>(grid: &mut Vec<Vec<T>>, pos: Point) -> Option<&mut T> {
         .flatten()
 }
 
-pub fn set<T: Clone>(grid: &mut Vec<Vec<T>>, pos: Point, val: T) {
+pub fn set<T: Clone>(grid: &mut Grid<T>, pos: Point, val: T) {
     if pos.0 < 0 || pos.1 < 0 {
         return;
     }
@@ -102,7 +115,7 @@ pub fn set<T: Clone>(grid: &mut Vec<Vec<T>>, pos: Point, val: T) {
         .map(|x| x.get_mut(pos.0 as usize).map(|x| *x = val));
 }
 
-pub fn enumerate<T>(grid: &Vec<Vec<T>>) -> impl Iterator<Item = (Point, &T)> {
+pub fn enumerate<T>(grid: &Grid<T>) -> impl Iterator<Item = (Point, &T)> {
     grid.iter()
         .enumerate()
         .map(|(y, row)| {
@@ -113,7 +126,7 @@ pub fn enumerate<T>(grid: &Vec<Vec<T>>) -> impl Iterator<Item = (Point, &T)> {
         .flatten()
 }
 
-pub fn enumerate_mut<T>(grid: &mut Vec<Vec<T>>) -> impl Iterator<Item = (Point, &mut T)> {
+pub fn enumerate_mut<T>(grid: &mut Grid<T>) -> impl Iterator<Item = (Point, &mut T)> {
     grid.iter_mut()
         .enumerate()
         .map(|(y, row)| {
