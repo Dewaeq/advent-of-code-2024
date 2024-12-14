@@ -7,7 +7,7 @@ use std::{
 
 pub type Grid<T> = Vec<Vec<T>>;
 
-#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy, Hash)]
 pub struct Point(pub i32, pub i32);
 
 impl Point {
@@ -15,8 +15,14 @@ impl Point {
         Point(0, 0)
     }
 
+    /// up, right, down, left
     pub const fn orth_dirs() -> [Point; 4] {
         [Point(0, -1), Point(1, 0), Point(0, 1), Point(-1, 0)]
+    }
+
+    /// NE, SE, SW, NW
+    pub const fn diag_dirs() -> [Point; 4] {
+        [Point(1, -1), Point(1, 1), Point(-1, 1), Point(-1, -1)]
     }
 
     pub fn dist_squared(self, b: Point) -> i32 {
@@ -81,6 +87,11 @@ pub fn read_grid<T>(input: &str, mut parse: impl FnMut(Point, char) -> T) -> Gri
         .collect()
 }
 
+/// (nrows, ncols)
+pub fn shape<T>(grid: &Grid<T>) -> (usize, usize) {
+    (grid.len(), grid[0].len())
+}
+
 pub fn print_grid(grid: &Grid<impl Display>) {
     for line in grid {
         for val in line {
@@ -140,5 +151,12 @@ pub fn enumerate_mut<T>(grid: &mut Grid<T>) -> impl Iterator<Item = (Point, &mut
                 .enumerate()
                 .map(move |(x, val)| (Point(x as i32, y as i32), val))
         })
+        .flatten()
+}
+
+/// shape must be (nrows, ncols)
+pub fn enumerate_pos(shape: (usize, usize)) -> impl Iterator<Item = Point> {
+    (0..shape.0)
+        .map(move |y| (0..shape.1).map(move |x| Point(x as i32, y as i32)))
         .flatten()
 }
