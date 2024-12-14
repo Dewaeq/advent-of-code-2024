@@ -2,7 +2,7 @@
 
 use std::{
     fmt::Display,
-    ops::{Add, Sub},
+    ops::{Add, Mul, Sub},
 };
 
 pub type Grid<T> = Vec<Vec<T>>;
@@ -39,6 +39,21 @@ impl Point {
         let slope3 = c.slope(b);
 
         slope1 == slope2 && slope1 == slope3 && slope2 == slope3
+    }
+}
+impl Mul<Point> for i32 {
+    type Output = Point;
+
+    fn mul(self, rhs: Point) -> Self::Output {
+        Point(rhs.0 * self, rhs.1 * self)
+    }
+}
+
+impl Mul<i32> for Point {
+    type Output = Point;
+
+    fn mul(self, rhs: i32) -> Self::Output {
+        Point(self.0 * rhs, self.1 * rhs)
     }
 }
 
