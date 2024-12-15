@@ -11,18 +11,33 @@ pub type Grid<T> = Vec<Vec<T>>;
 pub struct Point(pub i32, pub i32);
 
 impl Point {
+    pub const NORTH: Point = Point(0, -1);
+    pub const EAST: Point = Point(1, 0);
+    pub const SOUTH: Point = Point(0, 1);
+    pub const WEST: Point = Point(-1, 0);
+
+    pub const NORHT_EAST: Point = Point(1, -1);
+    pub const SOUTH_EAST: Point = Point(1, 1);
+    pub const SOUTH_WEST: Point = Point(-1, 1);
+    pub const NORTH_WEST: Point = Point(-1, -1);
+
     pub const fn zero() -> Self {
         Point(0, 0)
     }
 
-    /// up, right, down, left
+    /// N, E, S, W
     pub const fn orth_dirs() -> [Point; 4] {
-        [Point(0, -1), Point(1, 0), Point(0, 1), Point(-1, 0)]
+        [Point::NORTH, Point::EAST, Point::SOUTH, Point::WEST]
     }
 
     /// NE, SE, SW, NW
     pub const fn diag_dirs() -> [Point; 4] {
-        [Point(1, -1), Point(1, 1), Point(-1, 1), Point(-1, -1)]
+        [
+            Point::NORHT_EAST,
+            Point::SOUTH_EAST,
+            Point::SOUTH_WEST,
+            Point::NORTH_WEST,
+        ]
     }
 
     pub fn dist_squared(self, b: Point) -> i32 {
