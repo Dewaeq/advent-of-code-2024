@@ -1,7 +1,9 @@
 #![allow(unused)]
 
 use std::{
+    collections::{BinaryHeap, HashMap, HashSet},
     fmt::Display,
+    hash::Hash,
     ops::{Add, Mul, Sub},
 };
 
@@ -38,6 +40,22 @@ impl Point {
             Point::SOUTH_WEST,
             Point::NORTH_WEST,
         ]
+    }
+
+    pub fn rotate_dir(self, cw: bool) -> Self {
+        let res = match self {
+            Point::NORTH => Point::EAST,
+            Point::EAST => Point::SOUTH,
+            Point::SOUTH => Point::WEST,
+            Point::WEST => Point::NORTH,
+            _ => unreachable!(),
+        };
+
+        if !cw {
+            -1 * res
+        } else {
+            res
+        }
     }
 
     pub fn dist_squared(self, b: Point) -> i32 {
@@ -189,4 +207,84 @@ pub fn enumerate_pos(shape: (usize, usize)) -> impl Iterator<Item = Point> {
     (0..shape.0)
         .map(move |y| (0..shape.1).map(move |x| Point(x as i32, y as i32)))
         .flatten()
+}
+
+#[derive(PartialEq, Eq)]
+struct DijkstraEntry<T> {
+    cost: i32,
+    value: T,
+}
+
+impl<T> PartialOrd for DijkstraEntry<T>
+where
+    T: Eq,
+{
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        other.cost.partial_cmp(&self.cost)
+    }
+}
+
+impl<T> Ord for DijkstraEntry<T>
+where
+    T: Eq,
+{
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        other.cost.cmp(&self.cost)
+    }
+}
+
+pub fn dijkstra<T, IT>(
+    start: T,
+    mut gen_children: impl FnMut(&T) -> IT,
+    mut stop_condition: impl FnMut(&T) -> bool,
+) -> HashMap<T, i32>
+where
+    T: Eq + PartialEq + Hash + Copy,
+    IT: IntoIterator<Item = (T, i32)>,
+{
+    let mut cost_table = HashMap::new();
+    cost_table.insert(start, 0);
+
+    let mut queue = BinaryHeap::new();
+    queue.push(DijkstraEntry {
+        cost: 0,
+        value: start,
+    });
+
+    while let Some(DijkstraEntry { cost, value }) = queue.pop() {
+        if stop_condition(&value) {
+            break;
+        }
+
+        let children = gen_children(&value);
+        for (child, child_cost) in children {
+            let new_cost = cost_table.get(&value).unwrap() + child_cost;
+
+            if cost_table.get(&child).is_none_or(|&d| d > new_cost) {
+                cost_table.insert(child, new_cost);
+
+                queue.push(DijkstraEntry {
+                    cost: new_cost,
+                    value: child,
+                });
+            }
+        }
+    }
+
+    cost_table
+}
+
+pub fn pop_min<T>(v: &mut Vec<T>, selector: impl Fn(&T) -> i32) -> Option<T> {
+    let mut i = None;
+    let mut lowest = i32::max_value();
+
+    for (idx, val) in v.iter().enumerate() {
+        let cost = selector(val);
+        if i.is_none_or(|_| lowest > cost) {
+            i = Some(idx);
+            lowest = cost;
+        }
+    }
+
+    i.map(|idx| v.swap_remove(idx))
 }
