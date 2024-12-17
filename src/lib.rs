@@ -1,6 +1,7 @@
 #![feature(portable_simd)]
 #![feature(binary_heap_into_iter_sorted)]
 #![feature(iter_array_chunks)]
+#![feature(iter_map_windows)]
 
 use aoc_runner_derive::aoc_lib;
 
@@ -14,6 +15,7 @@ pub mod day13;
 pub mod day14;
 pub mod day15;
 pub mod day16;
+pub mod day17;
 pub mod day2;
 pub mod day3;
 pub mod day4;
